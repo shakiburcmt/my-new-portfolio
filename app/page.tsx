@@ -371,7 +371,7 @@ export default function App() {
 
   const navLinks = [
     { id: "home", label: "Home" },
-    { id: "projects", label: "Work" },
+    { id: "projects", label: "Works" },
     { id: "services", label: "Global" },
     { id: "skills", label: "Stack" },
     { id: "contact", label: "Contact" },
