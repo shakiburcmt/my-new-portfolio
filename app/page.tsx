@@ -1,4 +1,6 @@
-import { AnimatePresence, motion, useScroll } from "framer-motion";
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   CheckCircle,
@@ -13,14 +15,44 @@ import {
   Layers,
   Linkedin,
   Mail,
-  Twitter,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 
 /**
- * MOCK DATA
+ * TYPES
  */
-const PROJECTS = [
+type Project = {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  description: string;
+  stack: string[];
+};
+
+type SkillCategory = {
+  name: string;
+  icon: ReactNode;
+  items: string[];
+};
+
+type Service = {
+  title: string;
+  price: string;
+  features: string[];
+  popular: boolean;
+};
+
+type GlassCardProps = {
+  children: ReactNode;
+  className?: string;
+  hoverEffect?: boolean;
+};
+
+/**
+ * MOCK DATA (typed)
+ */
+const PROJECTS: Project[] = [
   {
     id: 1,
     title: "FinTech Dashboard",
@@ -63,7 +95,7 @@ const PROJECTS = [
   },
 ];
 
-const SKILLS = [
+const SKILLS: SkillCategory[] = [
   {
     name: "Frontend",
     icon: <Layers className="w-5 h-5" />,
@@ -81,7 +113,7 @@ const SKILLS = [
   },
 ];
 
-const SERVICES = [
+const SERVICES: Service[] = [
   {
     title: "MVP Development",
     price: "Starter",
@@ -122,8 +154,12 @@ const SERVICES = [
  * COMPONENTS
  */
 
-// Reusable Glass Card Component
-const GlassCard = ({ children, className = "", hoverEffect = true }) => (
+// Reusable Glass Card Component (typed)
+const GlassCard: React.FC<GlassCardProps> = ({
+  children,
+  className = "",
+  hoverEffect = true,
+}) => (
   <div
     className={`
       relative overflow-hidden
@@ -147,10 +183,10 @@ const GlassCard = ({ children, className = "", hoverEffect = true }) => (
   </div>
 );
 
-// Custom "Swiper" Style Slider
-const ProjectSlider = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+// Custom "Swiper" Style Slider (typed)
+const ProjectSlider: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const nextSlide = () => {
     if (isAnimating) return;
@@ -170,7 +206,8 @@ const ProjectSlider = () => {
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
     return () => clearInterval(timer);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally empty to simulate autoplay
 
   return (
     <div className="relative w-full max-w-5xl mx-auto py-12">
@@ -180,6 +217,7 @@ const ProjectSlider = () => {
           <button
             onClick={prevSlide}
             className="p-3 rounded-full bg-white/5 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all text-white group"
+            aria-label="Previous slide"
           >
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
           </button>
@@ -189,6 +227,7 @@ const ProjectSlider = () => {
           <button
             onClick={nextSlide}
             className="p-3 rounded-full bg-white/5 hover:bg-white/20 border border-white/10 backdrop-blur-md transition-all text-white group"
+            aria-label="Next slide"
           >
             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </button>
@@ -198,15 +237,18 @@ const ProjectSlider = () => {
         <div className="w-full h-full relative">
           <AnimatePresence mode="popLayout">
             {PROJECTS.map((project, index) => {
-              // Only render if it's the current, prev or next for performance, but keeping your logic for position classes
-              let position = "translate-x-full opacity-0 scale-95 z-0";
+              // Position classes for animation/visibility
+              let position =
+                "translate-x-full opacity-0 scale-95 z-0 pointer-events-none";
               if (index === currentIndex) {
-                position = "translate-x-0 opacity-100 scale-100 z-20";
+                position =
+                  "translate-x-0 opacity-100 scale-100 z-20 pointer-events-auto";
               } else if (
                 index === currentIndex - 1 ||
                 (currentIndex === 0 && index === PROJECTS.length - 1)
               ) {
-                position = "-translate-x-full opacity-0 scale-95 z-0";
+                position =
+                  "-translate-x-full opacity-0 scale-95 z-0 pointer-events-none";
               }
 
               return (
@@ -230,7 +272,7 @@ const ProjectSlider = () => {
 
                     {/* Content Section */}
                     <div className="w-full md:w-1/2 p-8 flex flex-col justify-center relative bg-gradient-to-br from-white/5 to-transparent">
-                      <span className="text-cyan-400 text-sm font-tracking-wider uppercase mb-2 font-semibold">
+                      <span className="text-cyan-400 text-sm tracking-wider uppercase mb-2 font-semibold">
                         {project.category}
                       </span>
                       <h3 className="text-3xl font-bold text-white mb-4">
@@ -272,14 +314,12 @@ const ProjectSlider = () => {
           <button
             key={idx}
             onClick={() => setCurrentIndex(idx)}
-            className={`
-              h-2 rounded-full transition-all duration-300 
-              ${
-                idx === currentIndex
-                  ? "w-8 bg-cyan-400"
-                  : "w-2 bg-white/20 hover:bg-white/40"
-              }
-            `}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              idx === currentIndex
+                ? "w-8 bg-cyan-400"
+                : "w-2 bg-white/20 hover:bg-white/40"
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
       </div>
@@ -287,8 +327,8 @@ const ProjectSlider = () => {
   );
 };
 
-// Animated Map Background Component
-const WorldMap = () => (
+// Animated Map Background Component (typed)
+const WorldMap: React.FC = () => (
   <div className="absolute inset-0 opacity-20 pointer-events-none">
     {/* Simplified Abstract Map Dots */}
     <div className="absolute top-[30%] left-[20%] w-2 h-2 bg-cyan-400 rounded-full animate-ping" />
@@ -314,18 +354,18 @@ const WorldMap = () => (
   </div>
 );
 
+/**
+ * PAGE (default export)
+ */
 export default function App() {
-  const [activeSection, setActiveSection] = useState("home");
-  const [scrolled, setScrolled] = useState(false);
-
-  // Scroll progress for background parallax or indicators could be added here
-  const { scrollYProgress } = useScroll();
+  const [activeSection, setActiveSection] = useState<string>("home");
+  const [scrolled, setScrolled] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -351,7 +391,7 @@ export default function App() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.5, ease: "easeOut" as const },
     },
   };
 
@@ -383,23 +423,18 @@ export default function App() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`
-          fixed top-0 left-0 right-0 z-50 transition-all duration-300
-          ${
-            scrolled
-              ? "py-4 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/5"
-              : "py-6 bg-transparent"
-          }
-        `}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "py-4 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/5"
+            : "py-6 bg-transparent"
+        }`}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
           <div className="text-xl font-bold tracking-tighter flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white">
               <Code2 size={18} />
             </div>
-            <span className="text-white">
-              Dev<span className="text-cyan-400">Folio</span>.
-            </span>
+            <span className="text-white">Md. Shakibur Rahman</span>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
@@ -414,14 +449,9 @@ export default function App() {
                     ?.scrollIntoView({ behavior: "smooth" });
                   setActiveSection(link.id);
                 }}
-                className={`
-                  text-sm font-medium transition-colors hover:text-cyan-400 relative
-                  ${
-                    activeSection === link.id
-                      ? "text-cyan-400"
-                      : "text-slate-400"
-                  }
-                `}
+                className={`text-sm font-medium transition-colors hover:text-cyan-400 relative ${
+                  activeSection === link.id ? "text-cyan-400" : "text-slate-400"
+                }`}
               >
                 {link.label}
                 {activeSection === link.id && (
@@ -439,13 +469,17 @@ export default function App() {
             {/* Navbar Social Icons */}
             <div className="flex items-center gap-3 pr-4 border-r border-white/10">
               <a
-                href="#"
+                href="https://github.com/shakiburcmt"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-slate-400 hover:text-white transition-colors"
               >
                 <Github size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/shakiburcse/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-slate-400 hover:text-cyan-400 transition-colors"
               >
                 <Linkedin size={20} />
@@ -494,7 +528,7 @@ export default function App() {
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-cyan-400 to-purple-600">
               <div className="w-full h-full rounded-full overflow-hidden border-4 border-[#0f172a]">
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=400&h=400"
+                  src="/Shakibur.jpg"
                   alt="Profile"
                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                 />
@@ -502,7 +536,7 @@ export default function App() {
             </div>
             {/* Status Dot on Profile */}
             <div className="absolute bottom-2 right-2 w-6 h-6 bg-[#0f172a] rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
             </div>
           </motion.div>
 
@@ -548,7 +582,7 @@ export default function App() {
 
             {/* RESUME DOWNLOAD BUTTON */}
             <a
-              href="/resume.pdf" // Placeholder path
+              href="/Resume of Md. Shakibur Rahman.pdf"
               download="My_Resume.pdf"
               className="px-8 py-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-white font-medium hover:bg-white/10 transition-colors flex items-center gap-2 group"
             >
@@ -771,10 +805,18 @@ export default function App() {
               </div>
 
               <div className="flex justify-center gap-6 pt-8 border-t border-white/10">
-                {[Github, Linkedin, Twitter].map((Icon, i) => (
+                {[
+                  { Icon: Github, url: "https://github.com/shakiburcmt" },
+                  {
+                    Icon: Linkedin,
+                    url: "https://www.linkedin.com/in/shakiburcse/",
+                  },
+                ].map(({ Icon, url }, i) => (
                   <a
                     key={i}
-                    href="#"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="p-3 rounded-full bg-white/5 hover:bg-white/10 hover:text-cyan-400 text-slate-400 transition-all"
                   >
                     <Icon size={24} />
@@ -788,7 +830,7 @@ export default function App() {
 
       {/* FOOTER */}
       <footer className="relative z-10 py-8 text-center text-slate-500 text-sm">
-        <p>© 2024 DevFolio. Built with React & Tailwind.</p>
+        <p>© Md. Shakibur Rahman</p>
       </footer>
     </div>
   );
