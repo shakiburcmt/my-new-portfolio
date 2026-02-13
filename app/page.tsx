@@ -16,7 +16,7 @@ import {
   Mail,
   X,
 } from "lucide-react";
-import React, { ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 // Types for local page data and props.
 type Project = {
@@ -195,7 +195,7 @@ const EMAILJS_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "q1Z5NUYTux57WR_Iv";
 
 // Contact modal with EmailJS submit.
-const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
+function ContactModal({ isOpen, onClose }: ContactModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -365,37 +365,39 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       </motion.div>
     </div>
   );
-};
+}
 
 // Shared card shell used in most sections.
-const GlassCard: React.FC<GlassCardProps> = ({
+function GlassCard({
   children,
   className = "",
   hoverEffect = true,
-}) => (
-  <div
-    className={`
-      relative overflow-hidden
-      bg-white/5 
-      backdrop-blur-xl 
-      border border-white/10 
-      rounded-2xl 
-      shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
-      transition-all duration-500 ease-out
-      ${
-        hoverEffect
-          ? "hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]"
-          : ""
-      }
-      ${className}
-    `}
-  >
-    {children}
-  </div>
-);
+}: GlassCardProps) {
+  return (
+    <div
+      className={`
+        relative overflow-hidden
+        bg-white/5 
+        backdrop-blur-xl 
+        border border-white/10 
+        rounded-2xl 
+        shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
+        transition-all duration-500 ease-out
+        ${
+          hoverEffect
+            ? "hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]"
+            : ""
+        }
+        ${className}
+      `}
+    >
+      {children}
+    </div>
+  );
+}
 
 // Project carousel (custom, no external slider lib).
-const ProjectSlider: React.FC = () => {
+function ProjectSlider() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [direction, setDirection] = useState<1 | -1>(1);
@@ -591,7 +593,7 @@ const ProjectSlider: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 // Main page.
 export default function App() {
