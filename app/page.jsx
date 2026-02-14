@@ -16,45 +16,10 @@ import {
   Mail,
   X,
 } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
-
-// Types for local page data and props.
-type Project = {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  description: string;
-  stack: string[];
-  clientUrl: string;
-  serverUrl: string;
-  liveUrl: string;
-};
-
-type SkillCategory = {
-  name: string;
-  icon: ReactNode;
-  items: string[];
-};
-
-type NavLink = {
-  id: string;
-  label: string;
-};
-
-type GlassCardProps = {
-  children: ReactNode;
-  className?: string;
-  hoverEffect?: boolean;
-};
-
-type ContactModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
+import { useEffect, useState } from "react";
 
 // Page content.
-const PROJECTS: Project[] = [
+const PROJECTS = [
   {
     id: 1,
     title: "FinTech Dashboard",
@@ -109,7 +74,7 @@ const PROJECTS: Project[] = [
   },
 ];
 
-const SKILLS: SkillCategory[] = [
+const SKILLS = [
   {
     name: "Frontend",
     icon: <Layers className="w-5 h-5" />,
@@ -172,7 +137,7 @@ const TEAM_VALUES = [
   "Ownership from planning to production support.",
 ];
 
-const NAV_LINKS: NavLink[] = [
+const NAV_LINKS = [
   { id: "home", label: "Home" },
   { id: "projects", label: "Work" },
   { id: "skills", label: "Stack" },
@@ -195,7 +160,7 @@ const EMAILJS_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "q1Z5NUYTux57WR_Iv";
 
 // Contact modal with EmailJS submit.
-function ContactModal({ isOpen, onClose }: ContactModalProps) {
+function ContactModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -203,18 +168,16 @@ function ContactModal({ isOpen, onClose }: ContactModalProps) {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
@@ -243,7 +206,7 @@ function ContactModal({ isOpen, onClose }: ContactModalProps) {
       alert("Message sent successfully! I will get back to you soon.");
       setFormData({ name: "", email: "", subject: "", message: "" });
       onClose();
-    } catch (error: unknown) {
+    } catch (error) {
       console.error("Error sending message:", error);
       setSubmitError(
         error instanceof Error
@@ -372,7 +335,7 @@ function GlassCard({
   children,
   className = "",
   hoverEffect = true,
-}: GlassCardProps) {
+}) {
   return (
     <div
       className={`
@@ -398,9 +361,9 @@ function GlassCard({
 
 // Project carousel (custom, no external slider lib).
 function ProjectSlider() {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const [direction, setDirection] = useState<1 | -1>(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [direction, setDirection] = useState(1);
   const ANIMATION_MS = 1300;
   const SLIDE_OFFSET = 12;
 
@@ -420,7 +383,7 @@ function ProjectSlider() {
     setTimeout(() => setIsAnimating(false), ANIMATION_MS);
   };
 
-  const goToSlide = (index: number) => {
+  const goToSlide = (index) => {
     if (isAnimating) return;
     setIsAnimating(true);
     setDirection(index > currentIndex ? 1 : -1);
@@ -597,9 +560,9 @@ function ProjectSlider() {
 
 // Main page.
 export default function App() {
-  const [activeSection, setActiveSection] = useState<string>("home");
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [isContactOpen, setIsContactOpen] = useState<boolean>(false);
+  const [activeSection, setActiveSection] = useState("home");
+  const [scrolled, setScrolled] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   // Init EmailJS once on mount.
   useEffect(() => {
@@ -633,7 +596,7 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -667,7 +630,7 @@ export default function App() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" as const },
+      transition: { duration: 0.5, ease: "easeOut" },
     },
   };
 
